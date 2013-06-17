@@ -1,7 +1,9 @@
 package main;
 
+import camera.Camera;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
@@ -17,6 +19,10 @@ public class Main {
 
 	private static final int DISPLAY_WIDTH = 1280;
 	private static final int DISPLAY_HEIGHT = 720;
+
+	private Camera camera;
+
+	private long timeOfLastFrame;
 
 	public Main() {
 		initializeProgram();
@@ -34,6 +40,8 @@ public class Main {
 			Display.setDisplayMode(new DisplayMode(DISPLAY_WIDTH, DISPLAY_HEIGHT));
 			Display.setTitle("VBO Models");
 			Display.create();
+
+			Mouse.setGrabbed(true);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 			tearDownGL();
@@ -50,7 +58,7 @@ public class Main {
 	}
 
 	private void initializeVariables() {
-
+		camera = new Camera();
 	}
 
 	private void run() {
@@ -76,11 +84,25 @@ public class Main {
 	}
 
 	private void update() {
-
+		int delta = getDelta();
+		camera.update(delta);
 	}
 
 	private void tearDownGL() {
 		Display.destroy();
+	}
+
+	// UTILITY METHODS
+
+	private long getSystemTime() {
+		return System.nanoTime() / 1000000;
+	}
+
+	private int getDelta() {
+		long time = getSystemTime();
+		int delta = (int) (time - timeOfLastFrame);
+		timeOfLastFrame = time;
+		return delta;
 	}
 
 	public static void main(String[] args) {
