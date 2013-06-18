@@ -56,20 +56,19 @@ public class Camera {
 		// mouse
 		rotation.y += Mouse.getDX() * MOUSE_SPEED * delta;
 		rotation.x -= Mouse.getDY() * MOUSE_SPEED * delta;
-		System.out.println(rotation.y);
 		applyTransformations();
 	}
 
 	private void moveForward(float distance) {
 		position.z -= distance * Math.cos(Math.toRadians(rotation.y));
-		position.x -= distance * Math.sin(Math.toRadians(rotation.y));
-		position.y -= distance * Math.sin(Math.toRadians(rotation.x));
+		position.x += distance * Math.sin(Math.toRadians(rotation.y));
+		//position.y -= distance * Math.sin(Math.toRadians(rotation.x));
 	}
 
 	private void moveBackward(float distance) {
 		position.z += distance * Math.cos(Math.toRadians(rotation.y));
-		position.x += distance * Math.sin(Math.toRadians(rotation.y));
-		position.y += distance * Math.sin(Math.toRadians(rotation.x));
+		position.x -= distance * Math.sin(Math.toRadians(rotation.y));
+		//position.y += distance * Math.sin(Math.toRadians(rotation.x));
 	}
 
 	private void moveRight(float distance) {

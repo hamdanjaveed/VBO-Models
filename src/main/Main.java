@@ -63,8 +63,8 @@ public class Main {
 
 	private void run() {
 		while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-			render();
 			update();
+			render();
 			Display.update();
 			Display.sync(60);
 		}
