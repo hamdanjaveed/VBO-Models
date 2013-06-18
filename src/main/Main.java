@@ -1,13 +1,23 @@
 package main;
 
 import camera.Camera;
+import model.Face;
+import model.Model;
+import model.OBJLoader;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.util.vector.Vector3f;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
@@ -23,6 +33,12 @@ public class Main {
 	private Camera camera;
 
 	private long timeOfLastFrame;
+
+	// torus
+	private Model torusModel;
+
+	private int torusVertexHandle;
+	private int torusNormalHandle;
 
 	public Main() {
 		initializeProgram();
@@ -59,6 +75,62 @@ public class Main {
 
 	private void initializeVariables() {
 		camera = new Camera();
+		setupTorus();
+	}
+
+	private void setupTorus() {
+		setupModel();
+		setupVertexBufferObjects();
+	}
+
+	private void setupModel() {
+		try {
+			torusModel = OBJLoader.loadModelFromFile("src/model/torus.obj");
+		} catch (FileNotFoundException fileNotFoundException) {
+			fileNotFoundException.printStackTrace();
+			tearDownGL();
+			System.exit(1);
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+			tearDownGL();
+			System.exit(2);
+		}
+	}
+
+	private void setupVertexBufferObjects() {
+		torusVertexHandle = glGenBuffers();
+		torusNormalHandle = glGenBuffers();
+
+		FloatBuffer vertices = reserveData(torusModel.faces.size() * 36);
+		FloatBuffer normals = reserveData(torusModel.faces.size() * 36);
+		for (Face face : torusModel.faces) {
+			vertices.put(vectorAsFloats(torusModel.vertices.get(face.vertexIndex[0] - 1)));
+			vertices.put(vectorAsFloats(torusModel.vertices.get(face.vertexIndex[1] - 1)));
+			vertices.put(vectorAsFloats(torusModel.vertices.get(face.vertexIndex[2] - 1)));
+
+			normals.put(vectorAsFloats(torusModel.normals.get(face.normalIndex[0] - 1)));
+			normals.put(vectorAsFloats(torusModel.normals.get(face.normalIndex[1] - 1)));
+			normals.put(vectorAsFloats(torusModel.normals.get(face.normalIndex[2] - 1)));
+		}
+		vertices.flip();
+		normals.flip();
+
+		glBindBuffer(GL_ARRAY_BUFFER, torusVertexHandle);
+		glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, torusNormalHandle);
+		glBufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	private float[] vectorAsFloats(Vector3f vector) {
+		return new float[] { vector.x, vector.y, vector.z };
+	}
+
+	private FloatBuffer reserveData(int size) {
+		FloatBuffer data = BufferUtils.createFloatBuffer(size);
+		return data;
 	}
 
 	private void run() {

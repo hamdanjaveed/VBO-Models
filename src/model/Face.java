@@ -7,10 +7,10 @@ package model;
  */
 public class Face {
 
-	public float[] vertexIndex = new float[3];
-	public float[] normalIndex = new float[3];
+	public int[] vertexIndex = new int[3];
+	public int[] normalIndex = new int[3];
 
-	public Face(float[] vertexIndex, float[] normalIndex) {
+	public Face(int[] vertexIndex, int[] normalIndex) {
 		this.vertexIndex = vertexIndex;
 		this.normalIndex = normalIndex;
 	}
