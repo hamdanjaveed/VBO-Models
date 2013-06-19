@@ -69,7 +69,7 @@ public class Main {
 	private void initializeGL() {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(65.0f, (float)(DISPLAY_WIDTH / DISPLAY_HEIGHT), 0.001f, 500.0f);
+		gluPerspective(65.0f, (float) DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.001f, 500.0f);
 		glMatrixMode(GL_MODELVIEW);
 	}
 
@@ -101,8 +101,8 @@ public class Main {
 		torusVertexHandle = glGenBuffers();
 		torusNormalHandle = glGenBuffers();
 
-		FloatBuffer vertices = reserveData(torusModel.faces.size() * 36);
-		FloatBuffer normals = reserveData(torusModel.faces.size() * 36);
+		FloatBuffer vertices = reserveData(torusModel.faces.size() * 3 * 3);
+		FloatBuffer normals = reserveData(torusModel.faces.size() * 3 * 3);
 		for (Face face : torusModel.faces) {
 			vertices.put(vectorAsFloats(torusModel.vertices.get(face.vertexIndex[0] - 1)));
 			vertices.put(vectorAsFloats(torusModel.vertices.get(face.vertexIndex[1] - 1)));
@@ -146,6 +146,23 @@ public class Main {
 
 	private void render() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glBindBuffer(GL_ARRAY_BUFFER, torusVertexHandle);
+		glVertexPointer(3, GL_FLOAT, 0, 0L);
+
+		glBindBuffer(GL_ARRAY_BUFFER, torusNormalHandle);
+		glNormalPointer(GL_FLOAT, 0, 0L);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
+
+		glColor3f(0.8f, 0.60f, 0.6f);
+		glDrawArrays(GL_TRIANGLES, 0, torusModel.faces.size() * 3);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	private void update() {
@@ -154,6 +171,9 @@ public class Main {
 	}
 
 	private void tearDownGL() {
+		glDeleteBuffers(torusVertexHandle);
+		glDeleteBuffers(torusNormalHandle);
+
 		Display.destroy();
 	}
 
