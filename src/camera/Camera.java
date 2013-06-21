@@ -16,7 +16,7 @@ public class Camera {
 	private static final float MOVE_SPEED = 0.01f;
 	private static final float MOUSE_SPEED = 0.01f;
 
-	private Vector3f position;
+	public Vector3f position;
 	private Vector3f rotation;
 
 	public Camera() {
